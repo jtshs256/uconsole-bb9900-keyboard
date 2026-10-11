@@ -29,13 +29,18 @@
 // plain layers: hold Left Fn, then also hold Right Fn, then press the \ key.
 #define BOOT 7
 
-// What pressing the trackpad does: a mouse button, LCLK (left), MCLK
-// (middle) or RCLK (right). Left click unless the build says otherwise. The
-// middle-click firmware in build.yaml sets this from the command line, so
-// leave the #ifndef in place.
-#ifndef TRACKPAD_PRESS
+// Two mouse buttons that come as a pair: what pressing the trackpad does, and
+// what a tap on the B button does. Each is LCLK (left), MCLK (middle) or RCLK
+// (right). The standard firmware has left click on the trackpad and middle
+// click on B. The middle-click firmware in build.yaml swaps them by defining
+// MIDDLE_CLICK_TRACKPAD from the command line. For your own build, change the
+// two values after the #else.
+#ifdef MIDDLE_CLICK_TRACKPAD
+#define TRACKPAD_PRESS MCLK
+#else
 #define TRACKPAD_PRESS LCLK
 #endif
+
 
 // Ctrl+Shift+<key>, the kitty_mod chord. Used throughout the KITTY layer.
 #define KM(k) &kp LC(LS(k))
@@ -47,8 +52,6 @@
 #define JB_Y 3
 #define JB_SELECT 4
 #define JB_START 5
-
- 
 
 
 / {
@@ -134,12 +137,28 @@
             bindings = <&jb JB_SELECT>;
             pass-through;
         };
+        // A scroll switch: each press turns trackpad scrolling on or off, as
+        // on the stock firmware. Only the one-handed firmware uses it, on X.
+        // To have one elsewhere, put &scroll_toggle on a key, for example set
+        // X_KEY to it. Hold-Select scrolling keeps working alongside it.
+        scroll_toggle: scroll_toggle {
+            compatible = "zmk,behavior-scroll-hold";
+            #binding-cells = <0>;
+            bindings = <&none>;
+            toggle;
+        };
     };
 
+
     // Y and B in keyboard mode, as on the uConsole QMK firmware: hold either
-    // and the D-pad moves the pointer; a quick tap on its own still sends the
-    // key. Only the D-pad positions (0 5 6 7) turn a press into a hold, so
-    // rolling onto any other key keeps it a tap.
+    // and the D-pad moves the pointer. A quick tap on its own sends a key
+    // (dpad_mouse, on Y) or clicks a mouse button (dpad_mouse_click, on B).
+    // Only the D-pad positions (0 5 6 7) turn a press into a hold, so rolling
+    // onto any other key keeps it a tap.
+    //
+    // The click is sent when B is released, and only for a tap shorter than
+    // tapping-term-ms, so it cannot be held down to drag. For a button that
+    // can, bind the key to plain &mkp instead, which gives up its D-pad hold.
     behaviors {
         dpad_mouse: dpad_mouse {
             compatible = "zmk,behavior-hold-tap";
@@ -147,6 +166,14 @@
             flavor = "hold-preferred";
             tapping-term-ms = <200>;
             bindings = <&mo>, <&kp>;
+            hold-trigger-key-positions = <0 5 6 7>;
+        };
+        dpad_mouse_click: dpad_mouse_click {
+            compatible = "zmk,behavior-hold-tap";
+            #binding-cells = <2>;
+            flavor = "hold-preferred";
+            tapping-term-ms = <200>;
+            bindings = <&mo>, <&mkp>;
             hold-trigger-key-positions = <0 5 6 7>;
         };
     };
@@ -210,7 +237,7 @@
         sym_layer {
 
             bindings = <
-        &kp LEFT                      &mkp LCLK         &mkp TRACKPAD_PRESS  &kp Y   &kp X
+        &kp LEFT                      &mkp LCLK         &scroll_toggle  &kp Y   &kp X
 &kp K_VOL_UP   &kp K_VOL_DN &kp RIGHT               &mkp RCLK                       &kp  B      &kp A
 &lock_kb  &kp C_AC_PRINT &kp C_PAUSE  &kp C_MUTE &none   &none   &none   &kp F11    &kp F12   &kp BACKSLASH
 &none    &kp F1         &kp F2        &kp F3     &kp F4     &kp F5     &kp F6     &kp F7     &kp F8    &kp F9  &kp F10 &kp DEL
@@ -226,7 +253,7 @@
         upper_layer {
 
             bindings = <
-        &kp LEFT                      &mkp LCLK         &mkp TRACKPAD_PRESS  &kp Y   &kp X
+        &kp LEFT                      &mkp LCLK         &scroll_toggle  &kp Y   &kp X
 &kp UP   &kp DOWN &kp RIGHT               &mkp RCLK                       &kp  B      &kp A
 &lock_kb  &kp C_AC_PRINT &kp C_PAUSE  &kp C_MUTE &none   &none   &none   &kp F11    &kp F12   &kp BACKSLASH
 &none     &kp F1         &kp F2        &kp F3     &kp F4     &kp F5     &kp F6     &kp F7     &kp F8    &kp F9  &kp F10 &kp DEL
