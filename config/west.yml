@@ -8,6 +8,8 @@ manifest:
       url-base: https://github.com/thoughtfix
     - name: jhob101
       url-base: https://github.com/jhob101
+    - name: jtshs256
+      url-base: https://github.com/jtshs256
   projects:
     - name: zmk
       remote: jtshs256
