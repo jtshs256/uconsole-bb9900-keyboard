@@ -10,7 +10,7 @@ manifest:
       url-base: https://github.com/jhob101
   projects:
     - name: zmk
-      remote: jhob101
+      remote: jtshs256
       revision: main
       import: app/west.yml
   self:
