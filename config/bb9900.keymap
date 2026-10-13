@@ -13,6 +13,7 @@
 #include <dt-bindings/zmk/ext_power.h>
 #include <dt-bindings/zmk/modifiers.h>
 #include <dt-bindings/zmk/joystick.h>
+#include <dt-bindings/zmk/trackpad.h>
 
 #define SYM 1
 #define UPPER 2
@@ -195,9 +196,9 @@
     };
 
     // Fn+Esc when unlocked (lock_kb): switch the trackpad off, hold the key
-    // backlight off, then lock the keyboard.
-    // Fn+Esc again (unlock_kb, bound in unlock_layer): trackpad back on, the
-    // backlight back to whatever it was, and unlock.
+    // backlight and the trackpad light off, then lock the keyboard.
+    // Fn+Esc again (unlock_kb, bound in unlock_layer): trackpad back on, both
+    // lights back to whatever they were, and unlock.
     // Nothing is sent to the host either way. An earlier version also sent
     // the screen lock key, but no desktop binding for it proved reliable on
     // the uConsole, so the lock leaves the screen alone.
@@ -210,16 +211,25 @@
             #binding-cells = <1>;
         };
     };
+    // The trackpad light: Fn + / switches it off or on, and the choice is
+    // saved. The lock macros hold it off while locked without touching that
+    // choice. zmk,behavior-trackpad-light lives in the ZMK fork.
+    behaviors {
+        tp_light: tp_light {
+            compatible = "zmk,behavior-trackpad-light";
+            #binding-cells = <1>;
+        };
+    };
     macros {
         lock_kb: lock_kb {
             compatible = "zmk,behavior-macro";
             #binding-cells = <0>;
-            bindings = <&macro_tap &tp_enable 0 &bl BL_SUSPEND &tog LOCK>;
+            bindings = <&macro_tap &tp_enable 0 &bl BL_SUSPEND &tp_light TPL_SUSPEND &tog LOCK>;
         };
         unlock_kb: unlock_kb {
             compatible = "zmk,behavior-macro";
             #binding-cells = <0>;
-            bindings = <&macro_tap &tp_enable 1 &bl BL_RESUME &tog LOCK>;
+            bindings = <&macro_tap &tp_enable 1 &bl BL_RESUME &tp_light TPL_RESUME &tog LOCK>;
         };
     };
 
@@ -276,7 +286,7 @@
 &kp CAPSLOCK    &kp Q          &kp W         &kp E      &kp R      &kp T      &kp Y      &kp PAGE_UP      &kp INSERT     &kp O   &kp P
 &none    &kp A          &kp S         &kp D      &kp F      &tog GAME  &kp HOME      &kp END      &kp PAGE_DOWN     &kp L   &none &none         
 &none    &kp Z          &kp X         &kp C      &kp V      &kp B      &kp N      &kp M      &kp C_BRI_DN &kp C_BRI_UP &kp RSHFT
-  &sys_reset  &kp LCTRL               &kp LALT             &bl BL_TOG           &kp RALT         &kp RCTRL     &none           
+  &sys_reset  &kp LCTRL               &kp LALT             &tp_light TPL_TOG           &kp RALT         &kp RCTRL     &none           
 
             >;
         };
