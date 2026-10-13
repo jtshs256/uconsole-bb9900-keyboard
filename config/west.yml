@@ -13,7 +13,7 @@ manifest:
   projects:
     - name: zmk
       remote: jtshs256
-      revision: uconsole-sleep-test
+      revision: uconsole-sleep-beta
       import: app/west.yml
   self:
     path: config
