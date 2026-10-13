@@ -227,9 +227,8 @@
             bindings = <&macro_tap &tp_enable 0 &bl BL_SUSPEND &tp_light TPL_SUSPEND &tog LOCK>;
         };
         unlock_kb: unlock_kb {
-            compatible = "zmk,behavior-macro";
+            compatible = "zmk,behavior-uconsole-unlock";
             #binding-cells = <0>;
-            bindings = <&macro_tap &tp_enable 1 &bl BL_RESUME &tp_light TPL_RESUME &tog LOCK>;
         };
     };
 
