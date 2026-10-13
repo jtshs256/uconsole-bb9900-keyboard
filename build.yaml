@@ -30,3 +30,9 @@ include:
       -DDTS_EXTRA_CPPFLAGS=-DMIDDLE_CLICK_TRACKPAD
       -DCONFIG_ZMK_TRACKPAD_LIGHT_SYNC_BACKLIGHT=y
     artifact-name: bb9900-zmk-middle-click-sync-backlight
+  # Middle-click trackpad + force locked.
+  - board: bb9900
+    cmake-args: >-
+      -DDTS_EXTRA_CPPFLAGS=-DMIDDLE_CLICK_TRACKPAD
+      -DCONFIG_ZMK_UCONSOLE_FORCE_LOCK=y
+    artifact-name: bb9900-zmk-middle-click-force-lock
