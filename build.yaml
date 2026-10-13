@@ -24,3 +24,9 @@ include:
   - board: bb9900
     cmake-args: -DDTS_EXTRA_CPPFLAGS=-DONE_HANDED
     artifact-name: bb9900-zmk-one-handed
+  # Middle-click trackpad + synchronized keyboard/trackpad backlight.
+  - board: bb9900
+    cmake-args: >-
+      -DDTS_EXTRA_CPPFLAGS=-DMIDDLE_CLICK_TRACKPAD
+      -DCONFIG_ZMK_TRACKPAD_LIGHT_SYNC_BACKLIGHT=y
+    artifact-name: bb9900-zmk-middle-click-sync-backlight
