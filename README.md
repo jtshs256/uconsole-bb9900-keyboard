@@ -4,8 +4,9 @@ Custom firmware for the [hack2you uConsole trackpad keyboard kit](https://hack2y
 the replacement uConsole keyboard with an optical trackpad in place of the
 trackball.
 
-**It is for the V2.1 keyboard.** It may work on other versions of the
-keyboard, but it has only been tested on V2.1.
+Use with the modified version of [uConsole-Sleep](https://github.com/jtshs256/uConsole-sleep/tree/bb9900).
+
+**It is for the V2.1 keyboard.** It  has only been tested on V2.1.
 
 It carries over the features of the [qmk-uconsole](https://github.com/jhob101/qmk-uconsole)
 firmware for the original keyboard (gamepad mode, hold-Select scrolling, the
@@ -42,7 +43,6 @@ This is the normal mode. Letters, numbers and punctuation are as printed.
 | L / R buttons | Left click / right click. |
 | D-pad | Arrow keys. |
 | Select | Hold it and move the trackpad to scroll. A tap on its own sends the Select key (`KEY_FRONT` on Linux). |
-| Start | Super. |
 | A | F24. |
 | Y, B | Hold either and the D-pad moves the pointer. A quick tap on its own sends F21 (Y) or F23 (B). |
 | X | F22. |
@@ -67,6 +67,7 @@ Either Fn key works unless a row says otherwise.
 | Fn + Speaker | Mute |
 | Fn + Select | Print |
 | Fn + Start | Media pause |
+| Fn + Trackpad Click | Scroll lock |
 | Fn + G | [Gamepad mode](#gamepad-mode) on/off |
 | Fn + Esc | [Lock](#lock) / unlock |
 | Left Fn + D-pad up / down | Volume up / down |
@@ -380,6 +381,7 @@ sudo libinput debug-events --show-keycodes
   the fixes this fork starts from.
 - [j1n6's qmk-uconsole](https://github.com/j1n6/qmk-uconsole), whose gamepad
   mode, Select scrolling and keyboard lock were the model for this one.
+- [jhob101's uconsole-bb9900-keyboard](https://github.com/jhob101/uconsole-bb9900-keyboard).
 
 MIT licensed, the same as upstream. See [`LICENSE.txt`](LICENSE.txt).
 
