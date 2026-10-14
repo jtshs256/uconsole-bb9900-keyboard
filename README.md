@@ -43,31 +43,11 @@ This is the normal mode. Letters, numbers and punctuation are as printed.
 | D-pad | Arrow keys. |
 | Select | Hold it and move the trackpad to scroll. A tap on its own sends the Select key (`KEY_FRONT` on Linux). |
 | Start | Super. |
-| A | The [kitty key](#kitty-key). |
+| A | F24. |
 | Y, B | Hold either and the D-pad moves the pointer. A quick tap on its own sends F21 (Y) or F23 (B). |
 | X | F22. |
 | Speaker | Volume down. With Shift, volume up. With Fn, mute. |
-| Shift, Ctrl, Alt, AltGr | [One-shot modifiers](#one-shot-modifiers). |
 
-### One-shot modifiers
-
-Tap Shift, Ctrl, Alt or AltGr and let go, and it applies to the next key only.
-Tap Shift, then `a`, and you get `A`. Holding a modifier down works as normal.
-A tap that is never used expires after 60 seconds.
-
-### Kitty key
-
-The A button is a one-shot Ctrl+Shift for the [kitty](https://sw.kovidgoyal.net/kitty/)
-terminal, whose shortcuts are all Ctrl+Shift+something. Tap A, then C, and the
-keyboard sends Ctrl+Shift+C. Holding A works too.
-
-It covers these keys:
-
-- Letters `Q W E R T P S F G H J K L X C V B N M`
-- `Enter`, the arrow keys, `[ ] / - = , .`
-- `1` to `9`, which send Ctrl+Shift+F1 to Ctrl+Shift+F9
-
-Any other key is sent unchanged and ends the one-shot.
 
 ### Fn keys
 
@@ -107,8 +87,6 @@ as a keyboard and mouse (`/dev/input/js0` on Linux), and in gamepad mode:
 | Select | Button 5. Holding it still scrolls with the trackpad. |
 | Start | Button 6 |
 
-Shift, Ctrl and Alt are plain modifiers here, not one-shot. Everything else
-(typing, the trackpad, the Fn keys) works as in keyboard mode.
 
 Games will see a new controller, so button mappings in SDL or RetroArch need
 setting once.
@@ -155,9 +133,6 @@ Two shortcuts restart the keyboard into its bootloader for
 Neither works while the keyboard is locked, and the first does not work in
 gamepad mode, where Start is a joystick button.
 
-Because the Alt keys are [one-shot](#one-shot-modifiers), tapping both and then
-pressing Start also counts. The Fn route cannot be set off that way, as Fn keys
-are never one-shot.
 
 ## Changes in this fork
 
@@ -170,8 +145,6 @@ Added here:
 - **Hold Select to scroll**, replacing fix9900's click-the-trackpad toggle.
 - **Trackpad press is left click** again.
 - **Start is Super** (it was media Play).
-- **The kitty key** on A, and **one-shot modifiers**. These replace a
-  [keyd](https://github.com/rvaiya/keyd) config on the uConsole.
 - **Y / B plus the D-pad as a mouse.**
 - **The keyboard lock** on Fn + Esc, covering the keys, trackpad and backlight.
 - **Bluetooth switched off.** The right Fn pairing keys (Esc, 1 to 4) now match
@@ -346,14 +319,6 @@ restarts into whatever you copied.
 The firmware needs nothing installed on the uConsole. One thing to undo if you
 are coming from an earlier setup:
 
-### Remove keyd, if you used it
-
-If you ran keyd for one-shot modifiers or a kitty key with an earlier keyboard,
-stop it, or the two will stack:
-
-```sh
-sudo systemctl disable --now keyd
-```
 
 ## Customising
 
@@ -377,8 +342,7 @@ Common changes:
   is slower.
 - **Backlight auto-off delay:** `CONFIG_ZMK_IDLE_TIMEOUT` in `bb9900.conf`, in
   milliseconds.
-- **One-shot timeout:** `release-after-ms` on `osm` and `osl` in the keymap.
-- **Kitty key list:** the `kitty_layer` block in the keymap.
+
 
 The files under `config/boards/bb9900/` are not used by the build. The board
 definition comes from the ZMK fork.
