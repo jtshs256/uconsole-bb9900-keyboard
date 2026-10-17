@@ -26,10 +26,11 @@
 // unlock layers keep either Fn's Esc route alive when both Fn keys are held.
 #define LOCK 5
 #define UNLOCK_LEFT 6
+// Right Fn reaches its own unlock layer while locked.
+#define UNLOCK_RIGHT 7
 // Second way into the bootloader, a fallback that relies on nothing but
 // plain layers: hold Left Fn, then also hold Right Fn, then press the \ key.
-#define BOOT 7
-#define UNLOCK_RIGHT 8
+#define BOOT 8
 
 // Two mouse buttons that come as a pair: what pressing the trackpad does, and
 // what a tap on the B button does. Each is LCLK (left), MCLK (middle) or RCLK
@@ -220,7 +221,7 @@
         };
     };
     behaviors {
-        uconsole_lock_toggle: uconsole_lock_toggle {
+        lock_kb: lock_kb {
             compatible = "zmk,behavior-uconsole-lock-toggle";
             #binding-cells = <0>;
         };
@@ -258,7 +259,7 @@
             bindings = <
         &kp LEFT                      &mkp LCLK         &scroll_toggle  &kp Y   &kp X
 &kp K_VOL_UP   &kp K_VOL_DN &kp RIGHT               &mkp RCLK                       &kp  B      &kp A
-&uconsole_lock_toggle &kp C_AC_PRINT &kp C_PAUSE  &kp C_MUTE &none   &none   &none   &kp F11    &kp F12   &kp BACKSLASH
+&lock_kb &kp C_AC_PRINT &kp C_PAUSE  &kp C_MUTE &none   &none   &none   &kp F11    &kp F12   &kp BACKSLASH
 &none    &kp F1         &kp F2        &kp F3     &kp F4     &kp F5     &kp F6     &kp F7     &kp F8    &kp F9  &kp F10 &kp DEL
 &kp CAPSLOCK    &kp Q          &kp W         &kp E      &kp R      &kp T      &kp Y      &kp PAGE_UP      &kp INSERT     &kp O   &kp P
 &none    &kp A          &kp S         &kp D      &kp F      &tog GAME  &kp HOME      &kp END      &kp PAGE_DOWN     &kp L   &none &none         
@@ -274,7 +275,7 @@
             bindings = <
         &kp LEFT                      &mkp LCLK         &scroll_toggle  &kp Y   &kp X
 &kp UP   &kp DOWN &kp RIGHT               &mkp RCLK                       &kp  B      &kp A
-&uconsole_lock_toggle &kp C_AC_PRINT &kp C_PAUSE  &kp C_MUTE &none   &none   &none   &kp F11    &kp F12   &kp BACKSLASH
+&lock_kb &kp C_AC_PRINT &kp C_PAUSE  &kp C_MUTE &none   &none   &none   &kp F11    &kp F12   &kp BACKSLASH
 &none     &kp F1         &kp F2        &kp F3     &kp F4     &kp F5     &kp F6     &kp F7     &kp F8    &kp F9  &kp F10 &kp DEL
 &kp CAPSLOCK    &kp Q          &kp W         &kp E      &kp R      &kp T      &kp Y      &kp PAGE_UP      &kp INSERT     &kp O   &kp P
 &none    &kp A          &kp S         &kp D      &kp F      &tog GAME  &kp HOME      &kp END      &kp PAGE_DOWN     &kp L   &none &none         
@@ -324,14 +325,16 @@
         // Keyboard lock (Fn+Esc), as on the uConsole QMK firmware: every key
         // and both mouse buttons are ignored until Fn+Esc is pressed again.
         // Locking also switches the trackpad off and turns the key backlight
-        // off; unlocking undoes both. Being the highest layers, this holds in
-        // gamepad mode too. Not saved: a power cycle starts unlocked.
+        // off; unlocking undoes both. LOCK is above the game and mouse layers.
+        // BOOT (layer 8) is higher, so if it was already active when LOCK is
+        // engaged, its bindings keep priority until its Fn keys are released.
+        // Not saved: a power cycle starts unlocked.
         lock_layer {
 
             bindings = <
             &none                         &none             &none      &none     &none
 &none    &none    &none                   &none                           &none         &none
-&uconsole_lock_toggle &none &none &none &none &none &none &none &none &none
+&lock_kb &none &none &none &none &none &none &none &none &none
 &none &none &none &none &none &none &none &none &none &none &none &none
 &none &none &none &none &none &none &none &none &none &none &none
 &none &none &none &none &none &none &none &none &none &none &none &none
@@ -348,7 +351,23 @@
             bindings = <
             &trans                        &trans            &trans     &trans    &trans
 &trans   &trans   &trans                  &trans                          &trans        &trans
-&uconsole_lock_toggle &trans &trans &trans &trans &trans &trans &trans &trans &trans
+&lock_kb &trans &trans &trans &trans &trans &trans &trans &trans &trans
+&trans &trans &trans &trans &trans &trans &trans &trans &trans &trans &trans &trans
+&trans &trans &trans &trans &trans &trans &trans &trans &trans &trans &trans
+&trans &trans &trans &trans &trans &trans &trans &trans &trans &trans &trans &trans
+&trans &trans &trans &trans &trans &trans &trans &trans &trans &trans &trans
+  &trans &trans &trans &trans &trans &trans &trans
+            >;
+        };
+
+        // Right Fn held while locked: this independent layer sits above LOCK,
+        // preserving its Esc route when both Fn keys are down.
+        unlock_right_layer {
+
+            bindings = <
+            &trans                        &trans            &trans     &trans    &trans
+&trans   &trans   &trans                  &trans                          &trans        &trans
+&lock_kb &trans &trans &trans &trans &trans &trans &trans &trans &trans
 &trans &trans &trans &trans &trans &trans &trans &trans &trans &trans &trans &trans
 &trans &trans &trans &trans &trans &trans &trans &trans &trans &trans &trans
 &trans &trans &trans &trans &trans &trans &trans &trans &trans &trans &trans &trans
@@ -361,7 +380,8 @@
         // left Fn layer and adds \ = bootloader plus Space = backlight auto-off toggle. It is a deliberate
         // three-key, two-handed chord. Fn keys are not one-shot, so unlike
         // the Alt+Alt+Start shortcut it cannot be armed by earlier taps.
-        // Not reachable while the keyboard is locked.
+        // Cannot be newly activated while locked. If already active, it stays
+        // above LOCK until the held Fn keys are released.
         boot_layer {
 
             bindings = <
@@ -373,23 +393,6 @@
 &trans &trans &trans &trans &trans &trans &trans &trans &trans &trans &trans &trans
 &trans &trans &trans &trans &trans &trans &trans &trans &trans &trans &trans
   &trans &trans &trans &bl BL_AUTO_OFF_TOG &trans &trans &trans
-            >;
-        };
-
-        // Right Fn's independent unlock layer means releasing Left Fn while
-        // both are held does not remove the remaining Fn+Esc route. Keeping
-        // it after BOOT preserves BOOT's existing layer index (7).
-        unlock_right_layer {
-
-            bindings = <
-            &trans                        &trans            &trans     &trans    &trans
-&trans   &trans   &trans                  &trans                          &trans        &trans
-&uconsole_lock_toggle &trans &trans &trans &trans &trans &trans &trans &trans &trans
-&trans &trans &trans &trans &trans &trans &trans &trans &trans &trans &trans &trans
-&trans &trans &trans &trans &trans &trans &trans &trans &trans &trans &trans
-&trans &trans &trans &trans &trans &trans &trans &trans &trans &trans &trans &trans
-&trans &trans &trans &trans &trans &trans &trans &trans &trans &trans &trans
-  &trans &trans &trans &trans &trans &trans &trans
             >;
         };
 
