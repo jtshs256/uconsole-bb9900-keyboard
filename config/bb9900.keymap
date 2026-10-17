@@ -365,7 +365,7 @@
 
 
         // Left Fn held, then Right Fn as well: this layer sits on top of the
-        // left Fn layer and adds one key, \ = bootloader. It is a deliberate
+        // left Fn layer and adds \ = bootloader plus Space = backlight auto-off toggle. It is a deliberate
         // three-key, two-handed chord. Fn keys are not one-shot, so unlike
         // the Alt+Alt+Start shortcut it cannot be armed by earlier taps.
         // Not reachable while the keyboard is locked.
@@ -379,7 +379,7 @@
 &trans &trans &trans &trans &trans &trans &trans &trans &trans &trans &trans
 &trans &trans &trans &trans &trans &trans &trans &trans &trans &trans &trans &trans
 &trans &trans &trans &trans &trans &trans &trans &trans &trans &trans &trans
-  &trans &trans &trans &trans &trans &trans &trans
+  &trans &trans &trans &bl BL_AUTO_OFF_TOG &trans &trans &trans
             >;
         };
 
