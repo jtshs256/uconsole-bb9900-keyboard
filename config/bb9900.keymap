@@ -225,7 +225,7 @@
     };
     behaviors {
         lock_kb: lock_kb {
-            compatible = "zmk,behavior-uconsole-lock-toggle";
+            compatible = "zmk,behavior-host-lock-toggle";
             #binding-cells = <0>;
         };
     };
