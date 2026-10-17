@@ -30,7 +30,10 @@
 #define UNLOCK_RIGHT 7
 // Second way into the bootloader, a fallback that relies on nothing but
 // plain layers: hold Left Fn, then also hold Right Fn, then press the \ key.
-#define BOOT 8
+#define CONFIG 8
+#define FN_LEFT 0
+#define FN_RIGHT 1
+#define FN_LOCK_SYM 2
 
 // Two mouse buttons that come as a pair: what pressing the trackpad does, and
 // what a tap on the B button does. Each is LCLK (left), MCLK (middle) or RCLK
@@ -100,7 +103,7 @@
     // Ctrl+Alt+\ shortcut was dropped for exactly that reason: an armed Ctrl
     // followed by an ordinary Alt+\ was far too easy to produce.
     //
-    // The fallback, which no one-shot can trigger, is in boot_layer: hold
+    // The fallback, which no one-shot can trigger, is in config_layer: hold
     // Left Fn, then also Right Fn, then press the \ key.
     //
     // This is a mod-morph rather than a ZMK `combos` block because thoughtfix
@@ -226,6 +229,14 @@
             #binding-cells = <0>;
         };
     };
+    // Fn actions track physical presses separately from momentary and latched
+    // layers, so Fn Lock does not make an idle Fn appear physically held.
+    behaviors {
+        fn: fn {
+            compatible = "zmk,behavior-fn";
+            #binding-cells = <1>;
+        };
+    };
 
     keymap {
         compatible = "zmk,keymap";
@@ -249,22 +260,24 @@
 &kp TAB     &kp Q         &kp W      &kp E    &kp R      &kp T      &kp Y      &kp U      &kp I     &kp O   &kp P
 &kp SQT     &kp A         &kp S      &kp D    &kp F      &kp G      &kp H      &kp J      &kp K     &kp L   &kp SEMICOLON &kp ENTER        
 &kp LSHFT  &kp Z         &kp X      &kp C    &kp V      &kp B      &kp N      &kp M      &kp COMMA &kp DOT &kp RSHFT
-  &mo SYM   &kp LCTRL              &kp LALT             &kp SPACE           &kp RALT        &kp RCTRL    &mo UPPER        
+  &fn FN_LEFT &kp LCTRL &kp LALT &kp SPACE &kp RALT &kp RCTRL &fn FN_RIGHT
             >;
         };
 
 
+        // Hold Left Fn and press L to toggle SYM Fn Lock. When SYM is latched,
+        // L remains a normal letter unless Left Fn is physically held.
         sym_layer {
 
             bindings = <
-        &kp LEFT                      &mkp LCLK         &scroll_toggle  &kp Y   &kp X
-&kp K_VOL_UP   &kp K_VOL_DN &kp RIGHT               &mkp RCLK                       &kp  B      &kp A
+        &kp HOME                      &mkp LCLK         &scroll_toggle  &kp Y   &kp X
+&kp PAGE_UP   &kp PAGE_DOWN &kp END     &mkp RCLK                       &kp  B      &kp A
 &lock_kb &kp C_AC_PRINT &kp C_PAUSE  &kp C_MUTE &none   &none   &none   &kp F11    &kp F12   &kp BACKSLASH
 &none    &kp F1         &kp F2        &kp F3     &kp F4     &kp F5     &kp F6     &kp F7     &kp F8    &kp F9  &kp F10 &kp DEL
 &kp CAPSLOCK    &kp Q          &kp W         &kp E      &kp R      &kp T      &kp Y      &kp PAGE_UP      &kp INSERT     &kp O   &kp P
-&none    &kp A          &kp S         &kp D      &kp F      &tog GAME  &kp HOME      &kp END      &kp PAGE_DOWN     &kp L   &none &none         
+&none    &kp A          &kp S         &kp D      &kp F      &tog GAME  &kp HOME      &kp END      &kp PAGE_DOWN     &fn FN_LOCK_SYM   &none &none
 &none    &kp Z          &kp X         &kp C      &kp V      &kp B      &kp N      &kp M      &kp C_BRI_DN &kp C_BRI_UP &kp RSHFT
-  &none  &kp LCTRL               &kp LGUI             &bl BL_CYCLE           &kp RALT         &kp RCTRL     &mo BOOT
+  &fn FN_LEFT &kp LCTRL &kp LGUI &bl BL_CYCLE &kp RALT &kp RCTRL &fn FN_RIGHT
 
             >;
         };
@@ -273,8 +286,8 @@
         upper_layer {
 
             bindings = <
-        &kp LEFT                      &mkp LCLK         &scroll_toggle  &kp Y   &kp X
-&kp UP   &kp DOWN &kp RIGHT               &mkp RCLK                       &kp  B      &kp A
+        &kp HOME                      &mkp LCLK         &scroll_toggle  &kp Y   &kp X
+&kp PAGE_UP   &kp PAGE_DOWN &kp END     &mkp RCLK                       &kp  B      &kp A
 &lock_kb &kp C_AC_PRINT &kp C_PAUSE  &kp C_MUTE &none   &none   &none   &kp F11    &kp F12   &kp BACKSLASH
 &none     &kp F1         &kp F2        &kp F3     &kp F4     &kp F5     &kp F6     &kp F7     &kp F8    &kp F9  &kp F10 &kp DEL
 &kp CAPSLOCK    &kp Q          &kp W         &kp E      &kp R      &kp T      &kp Y      &kp PAGE_UP      &kp INSERT     &kp O   &kp P
@@ -326,7 +339,7 @@
         // and both mouse buttons are ignored until Fn+Esc is pressed again.
         // Locking also switches the trackpad off and turns the key backlight
         // off; unlocking undoes both. LOCK is above the game and mouse layers.
-        // BOOT (layer 8) is higher, so if it was already active when LOCK is
+        // CONFIG (layer 8) is higher, so if it was already active when LOCK is
         // engaged, its bindings keep priority until its Fn keys are released.
         // Not saved: a power cycle starts unlocked.
         lock_layer {
@@ -339,7 +352,7 @@
 &none &none &none &none &none &none &none &none &none &none &none
 &none &none &none &none &none &none &none &none &none &none &none &none
 &none &none &none &none &none &none &none &none &none &none &none
-  &mo UNLOCK_LEFT &none &none &none &none &none &mo UNLOCK_RIGHT
+  &fn FN_LEFT &none &none &none &none &none &fn FN_RIGHT
             >;
         };
 
@@ -376,18 +389,20 @@
             >;
         };
 
-        // Left Fn held, then Right Fn as well: this layer sits on top of the
-        // left Fn layer and adds \ = bootloader plus Space = backlight auto-off toggle. It is a deliberate
-        // three-key, two-handed chord. Fn keys are not one-shot, so unlike
+        // Left Fn held, then Right Fn as well: the CONFIG layer sits on top of the
+        // left Fn layer. Esc toggles LOCK, \ enters the bootloader, and Space
+        // toggles backlight auto-off only while unlocked. The bootloader chord
+        // remains available while locked. This is a deliberate three-key,
+        // two-handed chord. Fn keys are not one-shot, so unlike
         // the Alt+Alt+Start shortcut it cannot be armed by earlier taps.
         // Cannot be newly activated while locked. If already active, it stays
         // above LOCK until the held Fn keys are released.
-        boot_layer {
+        config_layer {
 
             bindings = <
             &trans                        &trans            &trans     &trans    &trans
 &trans   &trans   &trans                  &trans                          &trans        &trans
-&trans &trans &trans &trans &trans &trans &trans &trans &trans &bootloader
+&lock_kb &trans &trans &trans &trans &trans &trans &trans &trans &bootloader
 &trans &trans &trans &trans &trans &trans &trans &trans &trans &trans &trans &trans
 &trans &trans &trans &trans &trans &trans &trans &trans &trans &trans &trans
 &trans &trans &trans &trans &trans &trans &trans &trans &trans &trans &trans &trans
