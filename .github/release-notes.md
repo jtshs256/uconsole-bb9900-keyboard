@@ -20,3 +20,6 @@ What every key does is in the
 Back up the firmware you are running now before you flash (copy `CURRENT.UF2`
 off the bootloader drive). This is a spare-time project, tested on one
 keyboard: flash at your own risk.
+
+1.1.3：
+LED effect improvement
